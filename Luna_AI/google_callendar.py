@@ -1,4 +1,6 @@
 import datetime
+
+import pytz
 import os.path
 
 from google.auth.transport.requests import Request
@@ -9,13 +11,16 @@ from googleapiclient.errors import HttpError
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
+creds = None
 
-
+calendar_id = []
+formated_datetime = None
+summary = None
 def main():
     """Shows basic usage of the Google Calendar API.
   Prints the start and name of the next 10 events on the user's calendar.
   """
-    creds = None
+    global creds
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
@@ -33,3 +38,38 @@ def main():
         # Save the credentials for the next run
         with open("token.json", "w") as token:
             token.write(creds.to_json())
+
+
+def upcoming_events():
+    global formated_datetime
+    global summary
+    with open(r'C:\Users\evryt\OneDrive\Documents\WorkProjectTXTs\calendar_id.txt', 'r') as file:
+        for line in file:
+            calendar_id.append(line.strip())
+
+    service = build('calendar', 'v3', credentials=creds)
+    warsaw_tz = pytz.timezone('Europe/Warsaw')
+    now = datetime.datetime.now(warsaw_tz)
+    end_time = now + datetime.timedelta(days=2)
+
+    now_iso = now.isoformat()
+    end_iso = end_time.isoformat()
+    try:
+        events_result = service.events().list(calendarId=calendar_id[0], timeMin=now_iso, timeMax=end_iso,
+                                              maxResults=10, singleEvents=True,
+                                              orderBy='startTime').execute()
+        events = events_result.get('items', [])
+
+        if not events:
+            print("No upcoming events found.")
+
+        nearest_event = events[0]
+        start = nearest_event['start'].get('dateTime', nearest_event['start'].get('date'))
+        summary = nearest_event.get('summary', 'No title')
+
+        datetime_obj = datetime.datetime.strptime(start, '%Y-%m-%dT%H:%M:%S%z')
+        formated_datetime = datetime_obj.strftime('%Y-%m-%d %H:%M')
+        # print(f"Your next event is: {summary} at {formated_datetime} o'clock")
+
+    except HttpError as error:
+        print(f'An error occurred: {error}')
