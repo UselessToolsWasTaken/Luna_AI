@@ -20,7 +20,7 @@ def what_time():
     current_time = datetime.now()
     ai_time = current_time.strftime("%I:%M %p")
     time_sentence = f"You could just check your phone Boss... It is currently {ai_time}."
-    time_audio = generate(api_key="c58335b3d8a8421ebe971198a1068cd1",
+    time_audio = generate(api_key=api_keys[1],
                           text=time_sentence,
                           voice=main.voice_id,
                           model="eleven_monolingual_v1"
