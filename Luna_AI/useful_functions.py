@@ -3,8 +3,10 @@ from elevenlabs import generate, play, voices, client
 import subprocess
 import main
 
+api_keys = main.api_keys
+
 eleven = ElevenLabs(
-    api_key="c58335b3d8a8421ebe971198a1068cd1"  # Defaults to ELEVEN_API_KEY
+    api_key=api_keys[1]  # Defaults to ELEVEN_API_KEY
 )
 launched_app = [r'C:\Program Files\Island\Island\Application\Island.exe',
                 r'C:\Program Files\Google\Chrome\Application\chrome.exe',
@@ -36,7 +38,7 @@ def launch_app():
             subprocess.Popen([launched_app[1]])
         elif application_value == 2:
             subprocess.Popen([launched_app[2]])
-        island_audio = generate(api_key="c58335b3d8a8421ebe971198a1068cd1",
+        island_audio = generate(api_key=api_keys[1],
                                 text=launch_sentence,
                                 voice=main.voice_id,
                                 model="eleven_monolingual_v1"
@@ -45,10 +47,13 @@ def launch_app():
         play(island_audio)
     except Exception as e:
         island_error = "I'm not really sure what you want me to open here boss?"
-        error_audio = generate(api_key="c58335b3d8a8421ebe971198a1068cd1",
+        error_audio = generate(api_key=api_keys[1],
                                text=island_error,
                                voice=main.voice_id,
                                model="eleven_monolingual_v1"
                                )
         print(island_error, e)
         play(error_audio)
+
+
+def send_message():
