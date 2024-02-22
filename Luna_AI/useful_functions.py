@@ -2,6 +2,7 @@ from elevenlabs.client import ElevenLabs
 from elevenlabs import generate, play, voices, client
 import subprocess
 import main
+import random as r
 
 api_keys = main.api_keys
 
@@ -12,7 +13,10 @@ launched_app = [r'C:\Program Files\Island\Island\Application\Island.exe',
                 r'C:\Program Files\Google\Chrome\Application\chrome.exe',
                 r'C:\Users\evryt\AppData\Local\Discord\app-1.0.9033\Discord.exe']
 
+interactions = []
+
 application_value = 0
+
 
 # Telling the Time
 def what_time():
@@ -56,4 +60,6 @@ def launch_app():
         play(error_audio)
 
 
-def send_message():
+def unprompted_interaction_joke():
+    random_interaction = r.randint(0, 50)
+

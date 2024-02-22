@@ -2,6 +2,8 @@
 # import elevenlabs.core.jsonable_encoder
 # import openai as opai
 from openai import OpenAI
+import threading
+import time
 import re
 import speech_recognition as sr
 from elevenlabs.client import ElevenLabs
@@ -11,10 +13,14 @@ import useful_functions
 api_keys = []
 voice_id = 'fZBVYnkF2DCL33sbSoHN'
 api_path = 'C:\\Users\\evryt\\OneDrive\\Documents\\WorkProjectTXTs\\API Keys\\api_keys.txt'
+interaction_path = r''
 
 with open(api_path, "r") as file:
     for line in file:
         api_keys.append(line.strip())  # Reads from a txt file on your system and appends the keys to the list api_keys
+with open(interaction_path, "r") as file:
+    for line in file:
+        useful_functions.interactions.append(line.strip())
 
 o_client = OpenAI(
     api_key=api_keys[0]
@@ -22,6 +28,8 @@ o_client = OpenAI(
 eleven = ElevenLabs(
     api_key=api_keys[1]
 )  # Setting the API keys into the system
+
+count_duration = 1
 
 application_list = ["island", "chrome", "discord", ]
 
@@ -67,9 +75,10 @@ def voiceCommands():  # The main loop that runs until the command 'Quit' Has bee
                 elif re.search(trigger_sentence, text,
                                re.IGNORECASE):  # If no specific command is called, run the talk function to use GPT 3.5 responses
                     talk_with_luna(text)
-                elif re.search(open_application, text, re.IGNORECASE):          # this is the application launch logic
-                    if re.search(application_list[0], text, re.IGNORECASE):     # No, I do not intend to use a more efficient way
-                        useful_functions.application_value = 0                  # At this point in time i don't even know if it works xD P.S It's working
+                elif re.search(open_application, text, re.IGNORECASE):  # this is the application launch logic
+                    if re.search(application_list[0], text,
+                                 re.IGNORECASE):  # No, I do not intend to use a more efficient way
+                        useful_functions.application_value = 0  # At this point in time i don't even know if it works xD P.S It's working
                         useful_functions.launch_app()
                     elif re.search(application_list[1], text, re.IGNORECASE):
                         useful_functions.application_value = 1
@@ -120,5 +129,19 @@ def talk_with_luna(voice_input):  # Lunas heart & soul. This is where her magic 
     print("Luna: ", text_to_speak)
 
 
+def countdown_for_interaction(duration):
+    while duration > 0:
+        time.sleep(1 * 60)
+        duration -= 1
+    try:
+        useful_functions.unprompted_interaction_joke()
+    except Exception as e:
+        print(f'could not run function {e}')
+
+
+luna_main_thread = threading.Thread(target=voiceCommands)
+rand_interaction_thread = threading.Thread(target=countdown_for_interaction, args=(count_duration,))
+
 if __name__ == "__main__":
-    voiceCommands()
+    luna_main_thread.start()
+    rand_interaction_thread.start()
