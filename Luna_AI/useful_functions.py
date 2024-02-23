@@ -1,11 +1,13 @@
+import random
+
 from elevenlabs.client import ElevenLabs
 from elevenlabs import generate, play, voices, client
+import json
 import subprocess
 import main
 import random as r
 import google_callendar as gc
 from openai import OpenAI
-
 
 api_keys = main.api_keys
 text = None
@@ -24,13 +26,24 @@ interactions = []
 
 application_value = 0
 
+cal_res, time_res = None, None
+
+
+def load_triggers(filename=r"C:\Users\evryt\PycharmProjects\Luna_AI\memory\function_replies.json"):
+    global time_res, cal_res
+    with open(filename, 'r') as file:
+        data = json.load(file)
+        time_res = data['Time Request']['response']
+        cal_res = data['Calendar Request']['response']
+
 
 # Telling the Time
 def what_time():
     from datetime import datetime
+    random_time_response = random.choice(time_res)
     current_time = datetime.now()
     ai_time = current_time.strftime("%I:%M %p")
-    time_sentence = f"You could just check your phone Boss... It is currently {ai_time}."
+    time_sentence = random_time_response.format(time=ai_time)
     time_audio = generate(api_key=api_keys[1],
                           text=time_sentence,
                           voice=main.voice_id,
@@ -89,13 +102,15 @@ def unprompted_interaction_joke():
 def planned_events():
     gc.main()
     gc.upcoming_events()
+    rand_cal_res = random.choice(cal_res)
+    cal_sentence = rand_cal_res.format(summary=gc.summary, datetime=gc.formated_datetime)
     # Finish implementing the calendar functionality
     event_audio = generate(api_key=api_keys[1],
-                           text=f"You have a planned event boss, {gc.summary} and it happens at {gc.formated_datetime} o'clock",
+                           text=cal_sentence,
                            voice=main.voice_id,
                            model="eleven_monolingual_v1"
                            )
-    event_text = f"You have a planned event boss, {gc.summary} and it happens at {gc.formated_datetime}"
+    event_text = cal_sentence
     play(event_audio)
     print(event_text)
 
@@ -119,11 +134,11 @@ def type_for_me():
                     "content": user_input
                 },
             ],
-            temperature=1.5,
+            temperature=0.6,
             max_tokens=256,
-            top_p=0.9,
-            frequency_penalty=1,
-            presence_penalty=1
+            top_p=0.7,
+            frequency_penalty=0.2,
+            presence_penalty=0.2
         )
         text_to_speak = response.choices[0].message.content
         tts = generate(

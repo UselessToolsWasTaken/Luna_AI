@@ -1,7 +1,5 @@
-# import os
-# import elevenlabs.core.jsonable_encoder
-# import openai as opai
 from openai import OpenAI
+import json
 import threading
 import time
 import re
@@ -11,59 +9,73 @@ from elevenlabs import generate, play, voices, client, voice
 import useful_functions
 import google_callendar as gc
 
+
+# Below are all the Variables currently used by the system.
+conv_start, time_request, open_request, calendar_request, send_message = None, None, None, None, None
+quit_condition = False
 text = None
 text_to_speak = None
 api_keys = []
 voice_id = 'fZBVYnkF2DCL33sbSoHN'
 api_path = 'C:\\Users\\evryt\\OneDrive\\Documents\\WorkProjectTXTs\\API Keys\\api_keys.txt'
-
-with open(api_path, "r") as file:
+# ------------------------------------------------------------------------------------------------------------
+with open(api_path, "r") as file: # Appending API key from file to api_keys variable
     for line in file:
-        api_keys.append(line.strip())  # Reads from a txt file on your system and appends the keys to the list api_keys
+        api_keys.append(line.strip())  
 
 o_client = OpenAI(
     api_key=api_keys[0]
-)
+)   # I don't really need to explain these do I?
 eleven = ElevenLabs(
     api_key=api_keys[1]
-)  # Setting the API keys into the system
-
-application_list = ["island", "chrome", "discord", ]
-
-# Trigger sentences for luna to react on when spoken to.
-trigger_sentence = "luna"
-tell_time = "what is the time"
-open_application = "please start"
-planned_events = "what are my upcoming events"
-send_message = "Send a message"
+)   # I don't really need to explain these do I?
 
 recognizer = sr.Recognizer()
 
 voices = voices()
 
+def load_triggers(filename=r"C:\Users\evryt\PycharmProjects\Luna_AI\memory\function_replies.json"): # Reads a JSON file with a set of prompts and stuff, check function_replies.json for more
+    global conv_start, time_request, open_request, calendar_request, send_message
+    with open(filename, 'r') as file:
+        data = json.load(file)
+        conv_start = data['Conversation']['triggers']
+        time_request = data['Time Request']['triggers']
+        open_request = data['Open Request']['triggers']
+        calendar_request = data['Calendar Request']['triggers']
+        send_message = data['Send Message']['triggers']
 
-def voiceCommands():  # The main loop that runs until the command 'Quit' Has been registered.
+
+def check_triggers(text, triggers): # This function runs right after the user speaks and checks the received text from speech for any trigger sentences/words
+    for trigger in triggers:
+        if re.search(trigger, text, re.IGNORECASE):
+            return True
+    return False
+
+# This is the main meat and potatoes of this system. Luna basically runs in here. 
+def voiceCommands(): 
+    global quit_condition
     global text
     audio = generate(api_key=api_keys[1],
                      text="Hello there! You're now talking to Luna. Say 'quit', to exit the conversation",
                      voice=voice_id,
                      model="eleven_monolingual_v1"
                      )
-    play(audio)  # Plays a welcome message
+    play(audio) # Short welcome message
     global text
     global application_value
+    load_triggers()                     # See load_triggers function
+    useful_functions.load_triggers()    # See load_triggers in useful_functions.py
     with sr.Microphone() as source:
-        recognizer.energy_threshold = 4000
-        print("You're now talking to Luna, say 'quit' to exit the conversation")  # This initializes the speech
+        recognizer.energy_threshold = 4000  # Microphone sensitivity, the number has no unit and I've chosen this one as it works best for my microphone
+        print("You're now talking to Luna, say 'quit' to exit the conversation")  
         # recognition
-        while True:
+        while True: # The loop begins, First we initiate the listening part of speech_recognition, then we run it through googles speech recognition service
             print("New Command input...")
-            raudio = recognizer.listen(source)  # Start the listener at the start of the loop and add a
-            # 10 second timeout
+            raudio = recognizer.listen(source)
             try:
-                text = recognizer.recognize_google(raudio)  # recognize speech using google speech recognition
-                print("You said: " + text)  # printing what was said, mostly for debugging purposes
-                if text.lower() == 'quit':  # Quit option, breaks the loop and turns off the app
+                text = recognizer.recognize_google(raudio)  # Parses the voice input into a string
+                print("You said: " + text)  
+                if text.lower() == 'quit':  # Simple quit function, currently not working as there's other loops independent of it.
                     quit_audio = generate(
                         api_key=api_keys[1],
                         text="Goodbye Boss! Have a Pleasant day!",
@@ -71,37 +83,26 @@ def voiceCommands():  # The main loop that runs until the command 'Quit' Has bee
                         model="eleven_monolingual_v1"
                     )
                     play(quit_audio)
+                    quit_condition = True
                     break
-                elif re.search(trigger_sentence, text,
-                               re.IGNORECASE):  # If no specific command is called, run the talk function to use GPT 3.5 responses
-                    talk_with_luna(text)
-                elif re.search(open_application, text, re.IGNORECASE):  # this is the application launch logic
-                    if re.search(application_list[0], text,
-                                 re.IGNORECASE):  # No, I do not intend to use a more efficient way
-                        useful_functions.application_value = 0  # At this point in time i don't even know if it works xD P.S It's working
-                        useful_functions.launch_app()
-                    elif re.search(application_list[1], text, re.IGNORECASE):
-                        useful_functions.application_value = 1
-                        useful_functions.launch_app()
-                    elif re.search(application_list[2], text, re.IGNORECASE):
-                        useful_functions.application_value = 2
-                        useful_functions.launch_app()
-                elif re.search(tell_time, text, re.IGNORECASE):
-                    useful_functions.what_time()
-                elif re.search(planned_events,text, re.IGNORECASE):
+                elif check_triggers(text, conv_start):          # Not gonna run each one solo, this is basically
+                    talk_with_luna(text)                        # Where Luna decides what she will do based on your input
+                elif check_triggers(text, time_request):        # Luna will understand multiple pre-defined 'trigger sentences'
+                    useful_functions.what_time()                # and act based on how she was programmed. All of those can be found in function_replies.json
+                elif check_triggers(text, calendar_request):
                     useful_functions.planned_events()
-                elif re.search(send_message, text, re.IGNORECASE):
+                elif check_triggers(text, send_message):
                     useful_functions.text = text
                     useful_functions.type_for_me()
-            except sr.UnknownValueError:  # Below is just some error handling
+            except sr.UnknownValueError:
                 print("command not recognized")
             except sr.RequestError as e:
                 print(f"Could not request results from speech recognition services; {e}")
 
-
-def talk_with_luna(voice_input):  # Lunas heart & soul. This is where her magic is done, she responds
+# This is the GPT system in the background. If no specific command is used, Luna will respond using this (Exception is the type_out_message function in useful_functions)
+def talk_with_luna(voice_input):  
     global text_to_speak
-    user_input = voice_input  # to you based on her set name and content(Personality)
+    user_input = voice_input 
     response = o_client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -116,11 +117,11 @@ def talk_with_luna(voice_input):  # Lunas heart & soul. This is where her magic 
                 "content": user_input
             },
         ],
-        temperature=1.5,
+        temperature=0.6,
         max_tokens=256,
-        top_p=0.9,
-        frequency_penalty=1,
-        presence_penalty=1
+        top_p=0.7,
+        frequency_penalty=0.2,
+        presence_penalty=0.2
     )
     text_to_speak = response.choices[0].message.content
     tts = generate(
@@ -134,12 +135,16 @@ def talk_with_luna(voice_input):  # Lunas heart & soul. This is where her magic 
 
 
 def countdown_for_interaction():
+    global quit_condition
     while True:
-        time.sleep(5 * 60)
-        try:
-            useful_functions.unprompted_interaction_joke()
-        except Exception as e:
-            print(f'could not run function {e}')
+        if quit_condition is False:
+            time.sleep(5 * 60)
+            try:
+                useful_functions.unprompted_interaction_joke()
+            except Exception as e:
+                print(f'could not run function {e}')
+        else:
+            break
 
 
 luna_main_thread = threading.Thread(target=voiceCommands)

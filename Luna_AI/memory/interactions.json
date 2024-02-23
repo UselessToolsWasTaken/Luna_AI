@@ -1,0 +1,22 @@
+{
+    "Interactions":{
+        "jokes":["Hey boss, I have a joke for you! How does Roadhog get to work every day... He takes the Hog-Wart express...haha!", 
+        "Boss, why did mercy break up with genji..? She said 'I need space' and he replied 'I need healing!', hilarious!", 
+        "Why do you think Mei is invited to parties? Well, because she knows how to break the ICE! The Ice BOSS!",
+        "Hey boss, I'm reading a book on anti-gravity... It's impossible to PUT DOWN! Put down boss... do you get it?",
+        "What do you call fake spaghetti boss? An Impasta! An Impasta boss! I fucking love this one!"],
+        
+        "reminders":["Did you remember to check your schedule boss?", "Make sure to clean up your room a bit before sleep boss!", 
+        "Remember to tweet about your work every now and then, don't want to keep the massess waiting!", "Did you reach out to your friends today? No need to be shy boss!",
+        "For the love of god, remember to work on the minecraft server at least once a week"],
+        
+        "health":["Hey boss! Make sure you stand up from the PC every now and then, gotta make sure your legs are still working", 
+        "How many hours did you spend here boss? Too long, go stand up for a bit and walk around the house at least please",
+        "You have that bike still boss? You could go for a 10 kilometer ride, nothing too fancy but a good start!"],
+
+        "positivity":["Oh, Boss, you're already so amazing, you don't need any more encouragement! But hey, keep shining like the star you are and conquering the world with your awesomeness! You got this!",
+        "Boss! Here's a sprinkle of positivity coming your way: You're as bright as a shooting star and as powerful as a supernova! Keep shining, Boss!",
+        "I'm here to sprinkle some sunshine and rainbows into your day! Just think of me as your personal happiness fairy, ready to make you smile at any moment! Let's turn that frown upside down!",
+        "Oh, Boss, you're just too good at what you do! Imposter syndrome is just your brain playing tricks on you. You're amazing, and everyone knows it! Just keep being awesome, and don't let those pesky thoughts get to you!"]
+    }
+}

@@ -1,0 +1,21 @@
+{
+  "Time Request": {
+    "triggers": ["what time is it?", "can you tell me the time?", "please tell me the time"],
+    "response": ["You could really just turn your head towards the clock Boss... It's {time}", "The time is {time} Boss.", "It's {time}"]
+  },
+  "Open Request":{
+    "triggers":["please open", "could you open", "please start", "launch", "run"],
+    "applications":["Chrome", "Island", "Spotify", "Discord", "Overwatch", "Valorant"],
+    "response":["Sure boss, launching now.", "Opening this bad boy for you boss!","It's coming on! It's There!","It should be starting? I think?"]
+  },
+  "Calendar Request":{
+    "triggers":["tell me my next appointment", "any planned events for the day", "what is my agenda for today", "check the calendar please"],
+    "response":["Of course, there's an event {summary}, it's happening an {datetime}", "You have an upcoming event {summary}, it starts at {datetime}", "Your plans for the day are {summary}, at {datetime}"]
+  },
+  "Send Message":{
+    "triggers":["send a message", "can you type out", "they replied with"]
+  },
+  "Conversation":{
+    "triggers":["luna", "hey luna", "hi luna", "hello luna", "good morning luna", "good evening Luna"]
+  }
+}
