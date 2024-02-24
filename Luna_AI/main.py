@@ -11,7 +11,7 @@ import google_callendar as gc
 
 
 # Below are all the Variables currently used by the system.
-conv_start, time_request, open_request, calendar_request, send_message = None, None, None, None, None
+conv_start, time_request, open_request, calendar_request, send_message, app_names = None, None, None, None, None, None
 quit_condition = False
 text = None
 text_to_speak = None
@@ -35,7 +35,7 @@ recognizer = sr.Recognizer()
 voices = voices()
 
 def load_triggers(filename=r"C:\Users\evryt\PycharmProjects\Luna_AI\memory\function_replies.json"): # Reads a JSON file with a set of prompts and stuff, check function_replies.json for more
-    global conv_start, time_request, open_request, calendar_request, send_message
+    global conv_start, time_request, open_request, calendar_request, send_message, app_names
     with open(filename, 'r') as file:
         data = json.load(file)
         conv_start = data['Conversation']['triggers']
@@ -43,6 +43,7 @@ def load_triggers(filename=r"C:\Users\evryt\PycharmProjects\Luna_AI\memory\funct
         open_request = data['Open Request']['triggers']
         calendar_request = data['Calendar Request']['triggers']
         send_message = data['Send Message']['triggers']
+        app_names = data["Open Request"]["applications"]
 
 
 def check_triggers(text, triggers): # This function runs right after the user speaks and checks the received text from speech for any trigger sentences/words
@@ -50,6 +51,12 @@ def check_triggers(text, triggers): # This function runs right after the user sp
         if re.search(trigger, text, re.IGNORECASE):
             return True
     return False
+
+def check_app(text, application):   # This script reads through the applications in the json and returns the index of a match found by re.search()
+    for index, app in enumerate(application):
+        if re.search(app, text, re.IGNORECASE):
+            return index
+    return None
 
 # This is the main meat and potatoes of this system. Luna basically runs in here. 
 def voiceCommands(): 
@@ -94,6 +101,9 @@ def voiceCommands():
                 elif check_triggers(text, send_message):
                     useful_functions.text = text
                     useful_functions.type_for_me()
+                elif check_triggers(text, open_request):
+                    useful_functions.application_value = check_app(text, app_names) # Assigns the index of the application mentioned to the application_value in useful_functions.py
+                    useful_functions.launch_app()
             except sr.UnknownValueError:
                 print("command not recognized")
             except sr.RequestError as e:
