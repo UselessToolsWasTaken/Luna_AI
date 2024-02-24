@@ -1,0 +1,11 @@
+{
+    "memory triggers":{
+        "memorize":["remember", "memorize", "keep a note"],
+        "mem":{
+            "likes":["likes", "enjoys", "loves", "is fond of"],
+            "dislikes":["dislikes", "does not enjoy", "does not like", "hates", "is not fond of"],
+            "personality":["is a", "is", "is usually"],
+            "events":["went to", "has been at", "has done", "did"]
+        }
+    }
+}

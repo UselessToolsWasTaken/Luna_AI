@@ -1,5 +1,4 @@
 import random
-
 from elevenlabs.client import ElevenLabs
 from elevenlabs import generate, play, voices, client
 import json
@@ -109,7 +108,9 @@ def unprompted_interaction_joke():  # Runs every few minutes to give you an unpr
 def planned_events():   # Checks the planned events in google_callendar.py and then uses a random response matrix to dynamically inform you of any events on your calendar
     gc.main()
     gc.upcoming_events()
+
     rand_cal_res = random.choice(cal_res)
+
     cal_sentence = rand_cal_res.format(summary=gc.summary, datetime=gc.formated_datetime)
     # Finish implementing the calendar functionality
     event_audio = generate(api_key=api_keys[1],
@@ -141,9 +142,9 @@ def type_for_me():  # Types out a message from your prompt, doesn't do it for an
                     "content": user_input
                 },
             ],
-            temperature=0.6,
+            temperature=1.2,
             max_tokens=256,
-            top_p=0.7,
+            top_p=1,
             frequency_penalty=0.2,
             presence_penalty=0.2
         )

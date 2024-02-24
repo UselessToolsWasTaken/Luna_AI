@@ -1,4 +1,5 @@
 from openai import OpenAI
+import search_engine as sen
 import json
 import threading
 import time
@@ -8,10 +9,12 @@ from elevenlabs.client import ElevenLabs
 from elevenlabs import generate, play, voices, client, voice
 import useful_functions
 import google_callendar as gc
+import memory_function as memf
+
 
 
 # Below are all the Variables currently used by the system.
-conv_start, time_request, open_request, calendar_request, send_message, app_names = None, None, None, None, None, None
+conv_start, time_request, open_request, calendar_request, send_message, app_names, g_search = None, None, None, None, None, None, None
 quit_condition = False
 text = None
 text_to_speak = None
@@ -35,7 +38,7 @@ recognizer = sr.Recognizer()
 voices = voices()
 
 def load_triggers(filename=r"C:\Users\evryt\PycharmProjects\Luna_AI\memory\function_replies.json"): # Reads a JSON file with a set of prompts and stuff, check function_replies.json for more
-    global conv_start, time_request, open_request, calendar_request, send_message, app_names
+    global conv_start, time_request, open_request, calendar_request, send_message, app_names, g_search
     with open(filename, 'r') as file:
         data = json.load(file)
         conv_start = data['Conversation']['triggers']
@@ -44,6 +47,7 @@ def load_triggers(filename=r"C:\Users\evryt\PycharmProjects\Luna_AI\memory\funct
         calendar_request = data['Calendar Request']['triggers']
         send_message = data['Send Message']['triggers']
         app_names = data["Open Request"]["applications"]
+        g_search = data['Google Search']['triggers']
 
 
 def check_triggers(text, triggers): # This function runs right after the user speaks and checks the received text from speech for any trigger sentences/words
@@ -104,6 +108,11 @@ def voiceCommands():
                 elif check_triggers(text, open_request):
                     useful_functions.application_value = check_app(text, app_names) # Assigns the index of the application mentioned to the application_value in useful_functions.py
                     useful_functions.launch_app()
+                elif check_triggers(text, g_search):
+                    sen.load_file()
+                    search_phrase = 'please google'
+                    search_query = text.replace(search_phrase, '')
+                    sen.search_the_web(search_query)
             except sr.UnknownValueError:
                 print("command not recognized")
             except sr.RequestError as e:
@@ -118,8 +127,8 @@ def talk_with_luna(voice_input):
         messages=[
             {
                 "role": "system", "name": "Luna",
-                "content": "You're happy to help with anything Boss wants. You're speaking in a happy tone, sometimes "
-                           "a bit sarcastic and insert jokes in your sentences"
+                "content": "You're here to help with anything Boss wants. You're speaking in a happy tone, sometimes "
+                           "a bit sarcastic"
             },
             {
                 "role": "user",
@@ -127,9 +136,9 @@ def talk_with_luna(voice_input):
                 "content": user_input
             },
         ],
-        temperature=0.6,
+        temperature=1.2,
         max_tokens=256,
-        top_p=0.7,
+        top_p=1,
         frequency_penalty=0.2,
         presence_penalty=0.2
     )

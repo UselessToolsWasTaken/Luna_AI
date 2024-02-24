@@ -49,7 +49,7 @@ def upcoming_events():
 
     service = build('calendar', 'v3', credentials=creds)
     warsaw_tz = pytz.timezone('Europe/Warsaw')
-    now = datetime.datetime.now(warsaw_tz)
+    now = datetime.datetime.now(tz=pytz.UTC).astimezone(warsaw_tz)
     end_time = now + datetime.timedelta(days=2)
 
     now_iso = now.isoformat()
@@ -67,8 +67,9 @@ def upcoming_events():
         start = nearest_event['start'].get('dateTime', nearest_event['start'].get('date'))
         summary = nearest_event.get('summary', 'No title')
 
-        datetime_obj = datetime.datetime.strptime(start, '%Y-%m-%dT%H:%M:%S%z')
-        formated_datetime = datetime_obj.strftime('%Y-%m-%d %H:%M')
+        datetime_obj_utc = datetime.datetime.strptime(start, '%Y-%m-%dT%H:%M:%S%z')
+        datetime_obj_cet = datetime_obj_utc.astimezone(warsaw_tz)
+        formated_datetime = datetime_obj_cet.strftime('%Y-%m-%d %H:%M')
         # print(f"Your next event is: {summary} at {formated_datetime} o'clock")
 
     except HttpError as error:
