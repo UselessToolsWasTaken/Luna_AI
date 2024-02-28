@@ -3,9 +3,9 @@
     "key_filepath": "your_api_path_here",
     "voice_id": "fZBVYnkF2DCL33sbSoHN",
     "memory_filepath": {
-      "function_replies": "C:\\Users\\evryt\\PycharmProjects\\Luna_AI\\memory\\function_replies.json",
-      "interactions": "C:\\Users\\evryt\\PycharmProjects\\Luna_AI\\memory\\interactions.json",
-      "memories": "C:\\Users\\evryt\\PycharmProjects\\Luna_AI\\memory\\memories.json"
+      "function_replies": "your_functionality_Json_here",
+      "interactions": "your_interactions_here",
+      "memories": "your_memories_here... All are JSONS and they are paths"
     },
     "static": {
       "gpt_config": {
