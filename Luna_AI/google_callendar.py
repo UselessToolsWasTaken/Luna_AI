@@ -1,8 +1,6 @@
 import datetime
-
 import pytz
 import os.path
-
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -16,6 +14,8 @@ creds = None
 calendar_id = []
 formated_datetime = None
 summary = None
+
+
 def main():
     """Shows basic usage of the Google Calendar API.
   Prints the start and name of the next 10 events on the user's calendar.

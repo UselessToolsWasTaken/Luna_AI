@@ -1,140 +1,87 @@
 import random
-from elevenlabs.client import ElevenLabs
-from elevenlabs import generate, play, voices, client
 import json
 import subprocess
-import main
 import random as r
-import google_callendar as gc
+
 from openai import OpenAI
+from elevenlabs.client import ElevenLabs
+from elevenlabs import generate, play, voices, client
 
-api_keys = main.api_keys
-text = None
+import google_callendar as gc
+from config import LoadConfig as LC
 
-eleven = ElevenLabs(
-    api_key=api_keys[1]  # Defaults to ELEVEN_API_KEY
-)
+api_keys = LC.api_keys
+voice_id = LC.voice_ID
+
 o_client = OpenAI(
     api_key=api_keys[0]
 )
-launched_app = [r'C:\Program Files\Island\Island\Application\Island.exe',
-                r'C:\Program Files\Google\Chrome\Application\chrome.exe',
-                r'C:\Users\evryt\AppData\Local\Discord\app-1.0.9033\Discord.exe',
-                r'D:\SteamLibrary\steamapps\common\Overwatch\Overwatch.exe',
-                r'C:\Riot Games\Riot Client\RiotClientServices.exe']
 
-interactions = []
-
-application_value = 0
-
-cal_res, time_res, app_res = None, None, None
+eleven = ElevenLabs(
+    api_key=api_keys[1]
+)
 
 
-def load_triggers(filename=r"C:\Users\evryt\PycharmProjects\Luna_AI\memory\function_replies.json"):
-    global time_res, cal_res, app_res
-    with open(filename, 'r') as file:
-        data = json.load(file)
-        time_res = data['Time Request']['response']
-        cal_res = data['Calendar Request']['response']
-        app_res = data['Open Request']['response']
-
-
-# Telling the Time
-def what_time():
+def tell_time():
     from datetime import datetime
-    random_time_response = random.choice(time_res)
+    random_response = random.choice(LC.time_answer)
     current_time = datetime.now()
-    ai_time = current_time.strftime("%I:%M %p")
-    time_sentence = random_time_response.format(time=ai_time)
-    time_audio = generate(api_key=api_keys[1],
-                          text=time_sentence,
-                          voice=main.voice_id,
-                          model="eleven_monolingual_v1"
-                          )
-    print(time_sentence)
-    play(time_audio)
+    ai_time = current_time.strftime("%H:%M")
+    time_response = random_response.format(time=ai_time)
+    audio = generate(api_key=api_keys[1],
+                     text=time_response,
+                     voice=voice_id,
+                     model="eleven_monolingual_v1")
+    print(time_response)
+    play(audio)
 
 
-def launch_app():   # This function runs apps based on the trigger sentence and which app was mentioned
+def launch_app(index):
+    app_path = LC.app_path
     try:
-        launch_sentence = random.choice(app_res)
-        if application_value == 0:
-            subprocess.Popen([launched_app[0]])
-        elif application_value == 1:
-            subprocess.Popen([launched_app[1]])
-        elif application_value == 2:
-            subprocess.Popen([launched_app[2]])
-        elif application_value == 3:
-            subprocess.Popen([launched_app[3]])
-        elif application_value == 4:
-            subprocess.Popen([launched_app[4]])
-        island_audio = generate(api_key=api_keys[1],
-                                text=launch_sentence,
-                                voice=main.voice_id,
-                                model="eleven_monolingual_v1"
-                                )
-        print(launch_sentence)
-        play(island_audio)
+        random_response = random.choice(LC.app_response)
+        audio = generate(api_key=api_keys[1],
+                         text=random_response,
+                         voice=voice_id,
+                         model="eleven_monolingual_v1")
+        print(random_response)
+        play(audio)
+        subprocess.Popen([app_path[index]])
     except Exception as e:
-        island_error = "I'm not really sure what you want me to open here boss?"
-        error_audio = generate(api_key=api_keys[1],
-                               text=island_error,
-                               voice=main.voice_id,
-                               model="eleven_monolingual_v1"
-                               )
-        print(island_error, e)
-        play(error_audio)
+        error_text = "I'm not really sure what you want me to open here boss?"
+        audio = generate(api_key=api_keys[1],
+                         text=error_text,
+                         voice=voice_id,
+                         model="eleven_monolingual_v1")
+        print(f'{error_text}: {e}')
+        play(audio)
 
 
-def unprompted_interaction_joke():  # Runs every few minutes to give you an unprompted interaction from the bot. 
-    global interactions
-    interaction_path = r'C:\Users\evryt\PycharmProjects\Luna_AI\interactions_doc.txt'
-    try:
-        with open(interaction_path, "r") as file:
-            for line in file:
-                interactions.append(line.strip())
-        random_interaction = r.randint(0, 4)
-        joke_audio = generate(api_key=api_keys[1],
-                              text=interactions[random_interaction],
-                              voice=main.voice_id,
-                              model="eleven_monolingual_v1"
-                              )
-        print(interactions[random_interaction])
-        play(joke_audio)
-    except Exception as e:
-        print(f"Could not run command {e}")
-
-
-def planned_events():   # Checks the planned events in google_callendar.py and then uses a random response matrix to dynamically inform you of any events on your calendar
+def planned_events():
     gc.main()
     gc.upcoming_events()
 
-    rand_cal_res = random.choice(cal_res)
-
-    cal_sentence = rand_cal_res.format(summary=gc.summary, datetime=gc.formated_datetime)
-    # Finish implementing the calendar functionality
-    event_audio = generate(api_key=api_keys[1],
-                           text=cal_sentence,
-                           voice=main.voice_id,
-                           model="eleven_monolingual_v1"
-                           )
-    event_text = cal_sentence
-    play(event_audio)
-    print(event_text)
+    random_response = random.choice(LC.cal_response)
+    response = random_response.format(summary=gc.summary, datetime=gc.formated_datetime)
+    audio = generate(api_key=api_keys[1],
+                     text=response,
+                     voice=voice_id,
+                     model="eleven_monolingual_v1"
+                     )
+    print(response)
+    play(audio)
 
 
-def type_for_me():  # Types out a message from your prompt, doesn't do it for any specific app, it will type the message in any message box you have selected, can also be a text file if you wish.
+def type_text(text):
     import keyboard
-    user_input = text  # to you based on her set name and content(Personality)
+    user_input = text
     try:
         response = o_client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=LC.gpt_version,
             messages=[
                 {
                     "role": "system", "name": "Luna",
-                    "content": "You're happy to help with anything Boss wants. You're speaking in a happy tone, "
-                               "sometimes"
-                               "a bit sarcastic and insert jokes in your sentences"
+                    "content": "Assistant AI"
                 },
                 {
                     "role": "user",
@@ -142,21 +89,21 @@ def type_for_me():  # Types out a message from your prompt, doesn't do it for an
                     "content": user_input
                 },
             ],
-            temperature=1.2,
-            max_tokens=256,
-            top_p=1,
-            frequency_penalty=0.2,
-            presence_penalty=0.2
+            temperature=LC.temperature,
+            max_tokens=LC.max_tokens,
+            top_p=LC.top_p,
+            frequency_penalty=LC.freq_pen,
+            presence_penalty=LC.pres_pen
         )
         text_to_speak = response.choices[0].message.content
         tts = generate(
             api_key=api_keys[1],
             text=text_to_speak,
-            voice=main.voice_id,
-            model="eleven_monolingual_v1"
+            voice=voice_id,
+            model='eleven_monolingual_v1'
         )
         play(tts)
-        print("Luna: ", text_to_speak)
-        keyboard.write(f'{text_to_speak} - Sent by Luna', delay=0.01)
+        print(f'Luna: {text_to_speak}')
+        keyboard.write(f'{text_to_speak} - sent by Luna', delay=0.01)
     except Exception as e:
         print(f"Could not send message: {e}")

@@ -5,7 +5,7 @@
   },
   "Open Request":{
     "triggers":["please open", "could you open", "please start", "launch", "run"],
-    "applications":["Island", "Chrome", "Discord", "Overwatch", "Valorant"],
+    "applications":["island", "chrome", "discord", "overwatch", "valorant"],
     "response":["Sure boss, launching now.", "Opening this bad boy for you boss!","It's coming on! It's There!","It should be starting? I think?"]
   },
   "Calendar Request":{
