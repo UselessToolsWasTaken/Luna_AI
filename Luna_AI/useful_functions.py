@@ -22,7 +22,7 @@ eleven = ElevenLabs(
 )
 
 
-def tell_time():
+def tell_time():    # Luna will tell you the time!
     from datetime import datetime
     random_response = random.choice(LC.time_answer)
     current_time = datetime.now()
@@ -36,7 +36,7 @@ def tell_time():
     play(audio)
 
 
-def launch_app(index):
+def launch_app(index):  # She will also run you apps based on the index that is passed from main's voice_commands()!
     app_path = LC.app_path
     try:
         random_response = random.choice(LC.app_response)
@@ -57,7 +57,7 @@ def launch_app(index):
         play(audio)
 
 
-def planned_events():
+def planned_events():   # She can also tell you that you're late!
     gc.main()
     gc.upcoming_events()
 
@@ -72,7 +72,7 @@ def planned_events():
     play(audio)
 
 
-def type_text(text):
+def type_text(text):    # But she can't actually send messages, she just types them out in any text field you have selected... sadge
     import keyboard
     user_input = text
     try:

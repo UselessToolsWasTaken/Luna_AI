@@ -14,7 +14,7 @@ eleven = ElevenLabs(
 voices = voices()
 
 
-def search_the_web(query):
+def search_the_web(query):  # literally just searches the web!
     try:
         query_encoded = query.replace(' ', '+')  # Encoding the query for a URL
         random_response = random.choice(LC.search_responses)

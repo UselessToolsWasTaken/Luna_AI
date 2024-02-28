@@ -17,9 +17,6 @@ summary = None
 
 
 def main():
-    """Shows basic usage of the Google Calendar API.
-  Prints the start and name of the next 10 events on the user's calendar.
-  """
     global creds
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -43,12 +40,12 @@ def main():
 def upcoming_events():
     global formated_datetime
     global summary
-    with open(r'C:\Users\evryt\OneDrive\Documents\WorkProjectTXTs\calendar_id.txt', 'r') as file:
+    with open(r'path to a folder with your calendar ID', 'r') as file:
         for line in file:
             calendar_id.append(line.strip())
 
     service = build('calendar', 'v3', credentials=creds)
-    warsaw_tz = pytz.timezone('Europe/Warsaw')
+    warsaw_tz = pytz.timezone('your timezone')
     now = datetime.datetime.now(tz=pytz.UTC).astimezone(warsaw_tz)
     end_time = now + datetime.timedelta(days=2)
 

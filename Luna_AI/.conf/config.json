@@ -1,6 +1,6 @@
 {
   "api_config": {
-    "key_filepath": "C:\\Users\\evryt\\OneDrive\\Documents\\WorkProjectTXTs\\API Keys\\api_keys.txt",
+    "key_filepath": "your_api_path_here",
     "voice_id": "fZBVYnkF2DCL33sbSoHN",
     "memory_filepath": {
       "function_replies": "C:\\Users\\evryt\\PycharmProjects\\Luna_AI\\memory\\function_replies.json",
@@ -25,11 +25,7 @@
       "web_search": "https://www.google.com/search?q={query_encoded}"
     },
     "application_paths": {
-      "applications": ["C:\\Program Files\\Island\\Island\\Application\\Island.exe",
-                        "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-                        "C:\\Users\\evryt\\AppData\\Local\\Discord\\app-1.0.9033\\Discord.exe",
-                        "D:\\SteamLibrary\\steamapps\\common\\Overwatch\\Overwatch.exe",
-                        "C:\\Riot Games\\Riot Client\\RiotClientServices.exe"]
+      "applications": ["app_path_here"]
     }
   }
 }
