@@ -22,7 +22,7 @@ o_client = OpenAI(
 )
 
 
-def load_memory_triggers(filename=r"C:\Users\evryt\PycharmProjects\Luna_AI\memory\function_replies.json"):
+def load_memory_triggers(filename=r"Path here"):
     global mem_triggers, like_triggers, dislike_triggers, pers_triggers, event_triggers, name_trigger
     with open(filename, 'r') as file:
         data = json.load(file)
