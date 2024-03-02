@@ -33,3 +33,9 @@ As I kept adding and piling functions ontop of Luna, she finally buckled and sho
 - Added a lot more error handling
 
 Currently Luna's in a good spot to chill on for a bit while I learn other languages. I'll still work on her, but it's been a bit draining not going to lie.
+
+# What will you need to run Luna on your own?
+
+- You will need API Key's for both ElevenLabs and OpenAI
+- If you want to beable to use the calendar functionality you'll need to set up your Google dev account and get a calendar credentials.json
+- Fill in the config.json and config.py with the appropriate paths
